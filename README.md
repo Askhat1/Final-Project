@@ -2,4 +2,5 @@
 
 This project detects and tracks flying drones using YOLOv8 and the SORT algorithm.
 
-
+```bash
+pip install -r requirements.txt
