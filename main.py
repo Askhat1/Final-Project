@@ -10,6 +10,7 @@ MODEL_PATH = "best.pt"
 
 model = YOLO(MODEL_PATH)
 tracker = Sort()
+trajectories = {}
 
 cap = cv2.VideoCapture(VIDEO_PATH)
 if not cap.isOpened():
@@ -44,9 +45,21 @@ while True:
 
     for obj in tracked:
         x1, y1, x2, y2, track_id = map(int, obj[:5])
+        cx = int((x1 + x2) / 2)
+        cy = int((y1 + y2) / 2)
+
+        if track_id not in trajectories:
+            trajectories[track_id] = []
+        trajectories[track_id].append((cx, cy))
+
         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
         cv2.putText(frame, f"ID: {int(track_id)}", (x1, y1 - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+        for point_idx in range(1, len(trajectories[track_id])):
+            pt1 = trajectories[track_id][point_idx - 1]
+            pt2 = trajectories[track_id][point_idx]
+            cv2.line(frame, pt1, pt2, (255, 0, 0), 2)
 
     out.write(frame)
 
